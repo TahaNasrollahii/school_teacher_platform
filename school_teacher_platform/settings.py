@@ -1,30 +1,59 @@
 from pathlib import Path
+import environ
+from django.utils.translation import gettext_lazy as _
 
+# ------------------------------------------------------------
+# Base directory
+# ------------------------------------------------------------
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-school-teacher-platform-secret-key-2024'
-DEBUG = True
-ALLOWED_HOSTS = ['*']
+# ------------------------------------------------------------
+# Environment setup
+# ------------------------------------------------------------
+env = environ.Env(
+    DEBUG=(bool, False),
+    CORS_ALLOW_ALL_ORIGINS=(bool, True),
+)
 
+environ.Env.read_env(BASE_DIR / ".env")
+
+# ------------------------------------------------------------
+# Core Django settings
+# ------------------------------------------------------------
+SECRET_KEY = env("SECRET_KEY", default="django-insecure-school-teacher-platform-secret-key-2024")
+
+DEBUG = env("DEBUG")
+
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["*"])
+
+# ------------------------------------------------------------
+# Applications
+# ------------------------------------------------------------
 INSTALLED_APPS = [
     'unfold',
     'unfold.contrib.filters',
     'unfold.contrib.forms',
     'unfold.contrib.inlines',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
+
     'schools',
     'teachers',
     'recommender',
 ]
 
+# ------------------------------------------------------------
+# Middleware
+# ------------------------------------------------------------
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -39,6 +68,9 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'school_teacher_platform.urls'
 
+# ------------------------------------------------------------
+# Templates
+# ------------------------------------------------------------
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -57,13 +89,23 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'school_teacher_platform.wsgi.application'
 
+# ------------------------------------------------------------
+# Database
+# ------------------------------------------------------------
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': env("DB_ENGINE"),
+        'NAME': BASE_DIR / env("DB_NAME") if "sqlite3" in env("DB_ENGINE") else env("DB_NAME"),
+        'USER': env("DB_USER", default=""),
+        'PASSWORD': env("DB_PASSWORD", default=""),
+        'HOST': env("DB_HOST", default=""),
+        'PORT': env("DB_PORT", default=""),
     }
 }
 
+# ------------------------------------------------------------
+# Password validation
+# ------------------------------------------------------------
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -71,14 +113,16 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
+# ------------------------------------------------------------
 # Internationalization
-LANGUAGE_CODE = 'en'
-TIME_ZONE = 'Asia/Tehran'
+# ------------------------------------------------------------
+LANGUAGE_CODE = env("LANGUAGE_CODE", default="en")
+
+TIME_ZONE = env("TIME_ZONE", default="Asia/Tehran")
+
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
-
-from django.utils.translation import gettext_lazy as _
 
 LANGUAGES = [
     ('en', _('English')),
@@ -89,9 +133,16 @@ LOCALE_PATHS = [
     BASE_DIR / 'locale',
 ]
 
+# ------------------------------------------------------------
+# Static files
+# ------------------------------------------------------------
 STATIC_URL = 'static/'
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# ------------------------------------------------------------
+# Django REST Framework
+# ------------------------------------------------------------
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
@@ -104,13 +155,14 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
 }
 
-CORS_ALLOW_ALL_ORIGINS = True
+# ------------------------------------------------------------
+# CORS
+# ------------------------------------------------------------
+CORS_ALLOW_ALL_ORIGINS = env("CORS_ALLOW_ALL_ORIGINS")
 
 # ------------------------------------------------------------
 # Unfold Admin configuration
 # ------------------------------------------------------------
-from django.utils.translation import gettext_lazy as _
-
 UNFOLD = {
     "SITE_TITLE": _("School-Teacher Platform"),
     "SITE_HEADER": _("School-Teacher Platform"),
@@ -120,7 +172,7 @@ UNFOLD = {
         "light": None,
         "dark": None,
     },
-    "SITE_SYMBOL": "school",          # Google Material symbol name
+    "SITE_SYMBOL": "school",
     "SHOW_HISTORY": True,
     "SHOW_VIEW_ON_SITE": True,
     "SHOW_BACK_BUTTON": True,
@@ -128,24 +180,24 @@ UNFOLD = {
     "COLORS": {
         "font": {
             "subtle-light": "107 114 128",
-            "subtle-dark":  "156 163 175",
+            "subtle-dark": "156 163 175",
             "default-light": "75 85 99",
-            "default-dark":  "209 213 219",
+            "default-dark": "209 213 219",
             "important-light": "17 24 39",
-            "important-dark":  "243 244 246",
+            "important-dark": "243 244 246",
         },
         "primary": {
-            "50":  "240 249 255",
+            "50": "240 249 255",
             "100": "224 242 254",
             "200": "186 230 253",
             "300": "125 211 252",
-            "400": "56  189 248",
-            "500": "14  165 233",  # sky-500 – main brand colour
-            "600": "2   132 199",
-            "700": "3   105 161",
-            "800": "7   89  133",
-            "900": "12  74  110",
-            "950": "8   47  73",
+            "400": "56 189 248",
+            "500": "14 165 233",
+            "600": "2 132 199",
+            "700": "3 105 161",
+            "800": "7 89 133",
+            "900": "12 74 110",
+            "950": "8 47 73",
         },
     },
     "SIDEBAR": {

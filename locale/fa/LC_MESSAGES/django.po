@@ -1,0 +1,244 @@
+# Persian (Farsi) translations for School-Teacher Matching Platform.
+# Copyright (C) 2024
+# This file is distributed under the same license as the project.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: school-teacher-platform 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-01-01 00:00+0000\n"
+"PO-Revision-Date: 2024-01-01 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: Persian\n"
+"Language: fa\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+# --- SchoolType choices ---
+msgid "Girls"
+msgstr "دخترانه"
+
+msgid "Boys"
+msgstr "پسرانه"
+
+msgid "Mixed"
+msgstr "مختلط"
+
+# --- EducationLevel choices ---
+msgid "Primary"
+msgstr "ابتدایی"
+
+msgid "Middle School"
+msgstr "متوسطه اول"
+
+msgid "High School"
+msgstr "متوسطه دوم"
+
+# --- School model verbose names ---
+msgid "User account"
+msgstr "حساب کاربری"
+
+msgid "School name"
+msgstr "نام مدرسه"
+
+msgid "School type"
+msgstr "نوع مدرسه"
+
+msgid "Education level"
+msgstr "مقطع تحصیلی"
+
+msgid "Phone number"
+msgstr "شماره تماس"
+
+msgid "District"
+msgstr "منطقه"
+
+msgid "Address"
+msgstr "آدرس"
+
+msgid "Created at"
+msgstr "تاریخ ایجاد"
+
+msgid "Updated at"
+msgstr "تاریخ بروزرسانی"
+
+msgid "Verified"
+msgstr "تأیید شده"
+
+msgid "School"
+msgstr "مدرسه"
+
+msgid "Schools"
+msgstr "مدارس"
+
+# --- SubjectNeed model verbose names ---
+msgid "Subject name"
+msgstr "نام درس"
+
+msgid "Required education level"
+msgstr "مقطع مورد نیاز"
+
+msgid "Minimum salary per hour (Toman)"
+msgstr "حداقل حقوق (تومان/ساعت)"
+
+msgid "Maximum salary per hour (Toman)"
+msgstr "حداکثر حقوق (تومان/ساعت)"
+
+msgid "Position filled"
+msgstr "پست پر شده"
+
+msgid "Subject need"
+msgstr "نیاز به مدرس"
+
+msgid "Subject needs"
+msgstr "نیازهای درسی"
+
+# --- Teacher model verbose names ---
+msgid "First name"
+msgstr "نام"
+
+msgid "Last name"
+msgstr "نام خانوادگی"
+
+msgid "National ID"
+msgstr "کد ملی"
+
+msgid "Primary teaching level"
+msgstr "مقطع اصلی تدریس"
+
+msgid "Years of experience"
+msgstr "سال‌های سابقه"
+
+msgid "Previous schools and institutes"
+msgstr "مدارس و آموزشگاه‌های قبلی"
+
+msgid "Publications and authored materials"
+msgstr "تألیفات و کتب"
+
+msgid "Minimum expected salary per hour (Toman)"
+msgstr "حداقل حقوق مدنظر (تومان/ساعت)"
+
+msgid "Maximum expected salary per hour (Toman)"
+msgstr "حداکثر حقوق مدنظر (تومان/ساعت)"
+
+msgid "Biography"
+msgstr "بیوگرافی"
+
+msgid "Available for hire"
+msgstr "آماده همکاری"
+
+msgid "Teacher"
+msgstr "معلم"
+
+msgid "Teachers"
+msgstr "معلمان"
+
+# --- TeachingSubject verbose names ---
+msgid "Years of experience in this subject"
+msgstr "سال‌های تجربه در این درس"
+
+msgid "Teaching subject"
+msgstr "درس تدریسی"
+
+msgid "Teaching subjects"
+msgstr "دروس تدریسی"
+
+# --- MatchStatus choices ---
+msgid "Pending"
+msgstr "در انتظار"
+
+msgid "School interested"
+msgstr "مدرسه علاقه‌مند"
+
+msgid "Teacher interested"
+msgstr "معلم علاقه‌مند"
+
+msgid "Mutual agreement"
+msgstr "توافق متقابل"
+
+msgid "Rejected"
+msgstr "رد شده"
+
+# --- TeacherSchoolMatch verbose names ---
+msgid "Overall match score"
+msgstr "امتیاز کلی تطابق"
+
+msgid "Salary overlap score"
+msgstr "امتیاز همپوشانی حقوقی"
+
+msgid "Same district"
+msgstr "هم‌منطقه‌ای"
+
+msgid "Subject match"
+msgstr "تطابق درس"
+
+msgid "Education level match"
+msgstr "تطابق مقطع"
+
+msgid "Status"
+msgstr "وضعیت"
+
+msgid "School note"
+msgstr "یادداشت مدرسه"
+
+msgid "Teacher note"
+msgstr "یادداشت معلم"
+
+msgid "Teacher–School match"
+msgstr "تطابق معلم-مدرسه"
+
+msgid "Teacher–School matches"
+msgstr "تطابق‌های معلم-مدرسه"
+
+# --- API response messages ---
+msgid "School registered successfully."
+msgstr "مدرسه با موفقیت ثبت شد."
+
+msgid "Teacher registered successfully."
+msgstr "معلم با موفقیت ثبت شد."
+
+msgid "Invalid credentials or no school account found."
+msgstr "نام کاربری یا رمز اشتباه است یا حساب مدرسه‌ای وجود ندارد."
+
+msgid "Invalid credentials or no teacher account found."
+msgstr "نام کاربری یا رمز اشتباه است یا حساب معلمی وجود ندارد."
+
+msgid "Recommendation engine ran successfully."
+msgstr "موتور توصیه با موفقیت اجرا شد."
+
+msgid "Matches refreshed successfully."
+msgstr "تطابق‌ها با موفقیت بروزرسانی شدند."
+
+msgid "Match not found."
+msgstr "تطابق یافت نشد."
+
+msgid "No profile found for this account."
+msgstr "پروفایلی برای این حساب یافت نشد."
+
+# --- Validation messages ---
+msgid "Minimum salary cannot exceed maximum salary."
+msgstr "حداقل حقوق نمی‌تواند بیشتر از حداکثر باشد."
+
+msgid "At least one subject need is required."
+msgstr "حداقل یک نیاز درسی باید وارد شود."
+
+msgid "This username is already taken."
+msgstr "این نام کاربری قبلاً استفاده شده است."
+
+msgid "National ID must contain digits only."
+msgstr "کد ملی باید فقط عدد باشد."
+
+msgid "A teacher with this national ID is already registered."
+msgstr "معلمی با این کد ملی قبلاً ثبت شده است."
+
+msgid "At least one teaching subject is required."
+msgstr "حداقل یک درس تدریسی باید وارد شود."
+
+# --- Language names ---
+msgid "English"
+msgstr "انگلیسی"
+
+msgid "Persian"
+msgstr "فارسی"

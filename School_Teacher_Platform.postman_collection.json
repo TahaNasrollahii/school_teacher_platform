@@ -1,0 +1,940 @@
+{
+  "info": {
+    "name": "School-Teacher Matching Platform",
+    "description": "Complete API collection for the School-Teacher Matching Platform.\n\n## Quick Start\n1. Run `POST School / Register` → the `school_token` variable is set automatically.\n2. Run `POST Teacher / Register` → the `teacher_token` variable is set automatically.\n3. Run `POST Recommender / Refresh Matches` to generate match scores.\n4. Explore `GET School Matches` and `GET Teacher Matches`.\n\n## Variables\n| Variable | Auto-set by | Description |\n|---|---|---|\n| `base_url` | Manual | Server URL (default: http://127.0.0.1:8000) |\n| `school_token` | School Login / Register | Auth token for school requests |\n| `teacher_token` | Teacher Login / Register | Auth token for teacher requests |\n| `admin_token` | Admin Login | Auth token for admin-only requests |\n| `subject_need_id` | Create Subject Need | ID of last created subject need |\n| `teaching_subject_id` | Add Teaching Subject | ID of last created teaching subject |\n| `match_id` | School/Teacher Matches | ID of first match in latest list response |",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "school-teacher-platform-v1"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000",
+      "type": "string",
+      "description": "Base URL of the Django development server"
+    },
+    {
+      "key": "school_token",
+      "value": "",
+      "type": "string",
+      "description": "Auth token for school user – auto-set on login/register"
+    },
+    {
+      "key": "teacher_token",
+      "value": "",
+      "type": "string",
+      "description": "Auth token for teacher user – auto-set on login/register"
+    },
+    {
+      "key": "admin_token",
+      "value": "",
+      "type": "string",
+      "description": "Auth token for admin user – set manually after admin login"
+    },
+    {
+      "key": "subject_need_id",
+      "value": "1",
+      "type": "string",
+      "description": "ID of a subject need – auto-set on Create Subject Need"
+    },
+    {
+      "key": "teaching_subject_id",
+      "value": "1",
+      "type": "string",
+      "description": "ID of a teaching subject – auto-set on Add Teaching Subject"
+    },
+    {
+      "key": "match_id",
+      "value": "1",
+      "type": "string",
+      "description": "ID of a match – auto-set on list responses"
+    }
+  ],
+  "item": [
+    {
+      "name": "🏫 Schools",
+      "description": "School account management, profile, and subject needs.",
+      "item": [
+        {
+          "name": "Register School",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const json = pm.response.json();",
+                  "    pm.collectionVariables.set('school_token', json.token);",
+                  "    pm.collectionVariables.set('subject_need_id', json.school_id ? '1' : '1');",
+                  "    pm.test('Registration successful', () => pm.expect(json).to.have.property('token'));",
+                  "    pm.test('School name returned', () => pm.expect(json.school_name).to.be.a('string'));",
+                  "} else {",
+                  "    pm.test('Registration failed – check body', () => pm.expect(pm.response.code).to.equal(201));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"school_demo\",\n  \"password\": \"demopass123\",\n  \"email\": \"school@demo.com\",\n  \"name\": \"Demo High School\",\n  \"school_type\": \"mixed\",\n  \"education_level\": \"high\",\n  \"phone\": \"02100000001\",\n  \"district\": \"District 3\",\n  \"address\": \"10 Pasdaran St, Tehran\",\n  \"subject_needs\": [\n    {\n      \"subject_name\": \"Physics\",\n      \"education_level\": \"high\",\n      \"min_salary_per_hour\": 500000,\n      \"max_salary_per_hour\": 800000\n    },\n    {\n      \"subject_name\": \"Math\",\n      \"education_level\": \"high\",\n      \"min_salary_per_hour\": 450000,\n      \"max_salary_per_hour\": 750000\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/schools/register/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "schools", "register", ""]
+            },
+            "description": "Create a new school account together with one or more subject needs.\n\nOn success (201) the `school_token` collection variable is set automatically."
+          }
+        },
+        {
+          "name": "Login School",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    pm.collectionVariables.set('school_token', json.token);",
+                  "    pm.test('Login successful', () => pm.expect(json).to.have.property('token'));",
+                  "    pm.test('school_name returned', () => pm.expect(json.school_name).to.be.a('string'));",
+                  "} else {",
+                  "    pm.test('Login failed – check credentials', () => pm.expect(pm.response.code).to.equal(200));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"school_tehran2\",\n  \"password\": \"pass1234\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/schools/login/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "schools", "login", ""]
+            },
+            "description": "Authenticate a school user and retrieve an auth token.\n\nSample credentials: `school_tehran2` / `pass1234`"
+          }
+        },
+        {
+          "name": "Get School Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Token {{school_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/schools/profile/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "schools", "profile", ""]
+            },
+            "description": "Retrieve the full profile of the authenticated school, including all subject needs."
+          }
+        },
+        {
+          "name": "Update School Profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Token {{school_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"02100000099\",\n  \"address\": \"15 Updated Street, Tehran\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/schools/profile/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "schools", "profile", ""]
+            },
+            "description": "Partially update the authenticated school's profile. Send only the fields you want to change."
+          }
+        },
+        {
+          "name": "List Subject Needs",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Token {{school_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/schools/subject-needs/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "schools", "subject-needs", ""]
+            },
+            "description": "List all subject needs (vacancies) belonging to the authenticated school."
+          }
+        },
+        {
+          "name": "Create Subject Need",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const json = pm.response.json();",
+                  "    pm.collectionVariables.set('subject_need_id', String(json.id));",
+                  "    pm.test('Subject need created', () => pm.expect(json.id).to.be.a('number'));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Token {{school_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subject_name\": \"Chemistry\",\n  \"education_level\": \"high\",\n  \"min_salary_per_hour\": 420000,\n  \"max_salary_per_hour\": 720000\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/schools/subject-needs/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "schools", "subject-needs", ""]
+            },
+            "description": "Add a new subject vacancy to the authenticated school.\n\nThe new record's `id` is stored in `subject_need_id` automatically."
+          }
+        },
+        {
+          "name": "Get Subject Need Detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Token {{school_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/schools/subject-needs/{{subject_need_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "schools", "subject-needs", "{{subject_need_id}}", ""]
+            },
+            "description": "Retrieve a single subject need by ID."
+          }
+        },
+        {
+          "name": "Update Subject Need",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Token {{school_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"min_salary_per_hour\": 480000,\n  \"max_salary_per_hour\": 780000\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/schools/subject-needs/{{subject_need_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "schools", "subject-needs", "{{subject_need_id}}", ""]
+            },
+            "description": "Partially update a subject need. Useful for adjusting the salary range or marking as filled."
+          }
+        },
+        {
+          "name": "Mark Subject Need as Filled",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Token {{school_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"is_filled\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/schools/subject-needs/{{subject_need_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "schools", "subject-needs", "{{subject_need_id}}", ""]
+            },
+            "description": "Mark a vacancy as filled. Filled needs are excluded from the recommendation engine."
+          }
+        },
+        {
+          "name": "Delete Subject Need",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Token {{school_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/schools/subject-needs/{{subject_need_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "schools", "subject-needs", "{{subject_need_id}}", ""]
+            },
+            "description": "Permanently delete a subject need."
+          }
+        },
+        {
+          "name": "List All Schools",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Token {{school_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/schools/list/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "schools", "list", ""],
+              "query": [
+                { "key": "district", "value": "District 3", "disabled": true, "description": "Filter by district (partial match)" },
+                { "key": "level", "value": "high", "disabled": true, "description": "Filter by education level: primary | middle | high" },
+                { "key": "page", "value": "1", "disabled": true, "description": "Pagination page number" }
+              ]
+            },
+            "description": "Browse all schools. Any authenticated user can access this.\n\nSupports optional query params: `district`, `level`, `page`."
+          }
+        }
+      ]
+    },
+    {
+      "name": "👨‍🏫 Teachers",
+      "description": "Teacher account management, profile, and teaching subjects.",
+      "item": [
+        {
+          "name": "Register Teacher",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const json = pm.response.json();",
+                  "    pm.collectionVariables.set('teacher_token', json.token);",
+                  "    pm.test('Registration successful', () => pm.expect(json).to.have.property('token'));",
+                  "    pm.test('full_name returned', () => pm.expect(json.full_name).to.be.a('string'));",
+                  "} else {",
+                  "    pm.test('Registration failed – check body', () => pm.expect(pm.response.code).to.equal(201));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"teacher_demo\",\n  \"password\": \"demopass123\",\n  \"email\": \"teacher@demo.com\",\n  \"first_name\": \"Sara\",\n  \"last_name\": \"Mousavi\",\n  \"national_id\": \"3344556677\",\n  \"phone\": \"09126666666\",\n  \"education_level\": \"high\",\n  \"district\": \"District 3\",\n  \"experience_years\": 7,\n  \"schools_history\": \"Al-Zahra High School\\nEstedad Institute\",\n  \"publications\": \"Advanced Physics Textbook\\nExam Prep Guide 2023\",\n  \"min_salary_per_hour\": 500000,\n  \"max_salary_per_hour\": 900000,\n  \"bio\": \"Experienced Physics teacher with 7 years in Tehran schools.\",\n  \"subjects\": [\n    {\n      \"subject_name\": \"Physics\",\n      \"education_level\": \"high\",\n      \"years_of_experience\": 7\n    },\n    {\n      \"subject_name\": \"Math\",\n      \"education_level\": \"high\",\n      \"years_of_experience\": 4\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/teachers/register/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "teachers", "register", ""]
+            },
+            "description": "Create a new teacher account with one or more teaching subjects.\n\nOn success (201) the `teacher_token` collection variable is set automatically.\n\n**Validation rules:**\n- `national_id` must be exactly 10 digits and globally unique\n- `min_salary_per_hour` ≤ `max_salary_per_hour`\n- At least one subject required"
+          }
+        },
+        {
+          "name": "Login Teacher",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    pm.collectionVariables.set('teacher_token', json.token);",
+                  "    pm.test('Login successful', () => pm.expect(json).to.have.property('token'));",
+                  "    pm.test('full_name returned', () => pm.expect(json.full_name).to.be.a('string'));",
+                  "} else {",
+                  "    pm.test('Login failed – check credentials', () => pm.expect(pm.response.code).to.equal(200));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"teacher1\",\n  \"password\": \"pass1234\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/teachers/login/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "teachers", "login", ""]
+            },
+            "description": "Authenticate a teacher user and retrieve an auth token.\n\nSample credentials: `teacher1` / `pass1234`"
+          }
+        },
+        {
+          "name": "Get Teacher Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Token {{teacher_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/teachers/profile/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "teachers", "profile", ""]
+            },
+            "description": "Retrieve the full profile of the authenticated teacher, including all teaching subjects."
+          }
+        },
+        {
+          "name": "Update Teacher Profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Token {{teacher_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"district\": \"District 5\",\n  \"min_salary_per_hour\": 520000,\n  \"max_salary_per_hour\": 920000,\n  \"bio\": \"Updated bio – now available for morning shifts.\",\n  \"is_available\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/teachers/profile/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "teachers", "profile", ""]
+            },
+            "description": "Partially update the authenticated teacher's profile."
+          }
+        },
+        {
+          "name": "List Teaching Subjects",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Token {{teacher_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/teachers/subjects/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "teachers", "subjects", ""]
+            },
+            "description": "List all teaching subjects (subject/level pairs) for the authenticated teacher."
+          }
+        },
+        {
+          "name": "Add Teaching Subject",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const json = pm.response.json();",
+                  "    pm.collectionVariables.set('teaching_subject_id', String(json.id));",
+                  "    pm.test('Subject created', () => pm.expect(json.id).to.be.a('number'));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Token {{teacher_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subject_name\": \"Chemistry\",\n  \"education_level\": \"high\",\n  \"years_of_experience\": 3\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/teachers/subjects/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "teachers", "subjects", ""]
+            },
+            "description": "Add a new teaching subject to the authenticated teacher's profile.\n\nThe new record's `id` is stored in `teaching_subject_id` automatically."
+          }
+        },
+        {
+          "name": "Get Teaching Subject Detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Token {{teacher_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/teachers/subjects/{{teaching_subject_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "teachers", "subjects", "{{teaching_subject_id}}", ""]
+            },
+            "description": "Retrieve a single teaching subject by ID."
+          }
+        },
+        {
+          "name": "Update Teaching Subject",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Token {{teacher_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"years_of_experience\": 5\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/teachers/subjects/{{teaching_subject_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "teachers", "subjects", "{{teaching_subject_id}}", ""]
+            },
+            "description": "Update experience years for a teaching subject."
+          }
+        },
+        {
+          "name": "Delete Teaching Subject",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Token {{teacher_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/teachers/subjects/{{teaching_subject_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "teachers", "subjects", "{{teaching_subject_id}}", ""]
+            },
+            "description": "Permanently delete a teaching subject from the teacher's profile."
+          }
+        },
+        {
+          "name": "List All Teachers",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Token {{teacher_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/teachers/list/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "teachers", "list", ""],
+              "query": [
+                { "key": "district", "value": "District 5", "disabled": true, "description": "Filter by district (partial match)" },
+                { "key": "level", "value": "high", "disabled": true, "description": "Filter by education level: primary | middle | high" },
+                { "key": "subject", "value": "Physics", "disabled": true, "description": "Filter by subject name (partial match)" },
+                { "key": "page", "value": "1", "disabled": true, "description": "Pagination page number" }
+              ]
+            },
+            "description": "Browse all available teachers.\n\nSupports optional query params: `district`, `level`, `subject`, `page`."
+          }
+        }
+      ]
+    },
+    {
+      "name": "🤝 Recommender",
+      "description": "Recommendation engine, match listings, status workflow, and statistics.",
+      "item": [
+        {
+          "name": "Get School Matches",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    if (json.results && json.results.length > 0) {",
+                  "        pm.collectionVariables.set('match_id', String(json.results[0].id));",
+                  "        pm.test('Matches returned', () => pm.expect(json.count).to.be.at.least(1));",
+                  "    } else {",
+                  "        pm.test('No matches yet – run Refresh first', () => pm.expect(json.count).to.be.at.least(1));",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Token {{school_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/recommend/school-matches/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "recommend", "school-matches", ""],
+              "query": [
+                { "key": "min_score", "value": "30", "disabled": true, "description": "Minimum match score threshold (0-100, default 30)" },
+                { "key": "subject_id", "value": "1", "disabled": true, "description": "Filter by specific SubjectNeed ID" },
+                { "key": "page", "value": "1", "disabled": true }
+              ]
+            },
+            "description": "Return the ranked list of teacher suggestions for the authenticated school.\n\nThe engine runs automatically on first access if no matches exist yet.\n\nThe first result's `id` is stored in `match_id` for use in status update requests."
+          }
+        },
+        {
+          "name": "Get Teacher Matches",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    if (json.results && json.results.length > 0) {",
+                  "        pm.collectionVariables.set('match_id', String(json.results[0].id));",
+                  "        pm.test('Matches returned', () => pm.expect(json.count).to.be.at.least(1));",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Token {{teacher_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/recommend/teacher-matches/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "recommend", "teacher-matches", ""],
+              "query": [
+                { "key": "min_score", "value": "30", "disabled": true, "description": "Minimum match score threshold (0-100, default 30)" },
+                { "key": "page", "value": "1", "disabled": true }
+              ]
+            },
+            "description": "Return the ranked list of school suggestions for the authenticated teacher.\n\nThe engine runs automatically on first access if no matches exist yet."
+          }
+        },
+        {
+          "name": "School – Express Interest",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Token {{school_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"school_interested\",\n  \"note\": \"We reviewed your profile and would love to discuss further. Please contact us.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/recommend/school-match/{{match_id}}/status/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "recommend", "school-match", "{{match_id}}", "status", ""]
+            },
+            "description": "School expresses interest in a suggested teacher.\n\nIf the teacher has already expressed interest, status advances to `mutual` automatically.\n\n**Valid status values:** `school_interested` · `rejected`"
+          }
+        },
+        {
+          "name": "School – Reject Match",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Token {{school_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"rejected\",\n  \"note\": \"We have filled this position.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/recommend/school-match/{{match_id}}/status/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "recommend", "school-match", "{{match_id}}", "status", ""]
+            },
+            "description": "School rejects a suggested teacher for a given vacancy."
+          }
+        },
+        {
+          "name": "Teacher – Express Interest",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Token {{teacher_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"teacher_interested\",\n  \"note\": \"I am available from the start of next term and very interested in this position.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/recommend/teacher-match/{{match_id}}/status/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "recommend", "teacher-match", "{{match_id}}", "status", ""]
+            },
+            "description": "Teacher expresses interest in a suggested school.\n\nIf the school has already expressed interest, status advances to `mutual` automatically.\n\n**Valid status values:** `teacher_interested` · `rejected`"
+          }
+        },
+        {
+          "name": "Teacher – Reject Match",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Token {{teacher_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"rejected\",\n  \"note\": \"The location does not suit my commute.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/recommend/teacher-match/{{match_id}}/status/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "recommend", "teacher-match", "{{match_id}}", "status", ""]
+            },
+            "description": "Teacher rejects a suggested school match."
+          }
+        },
+        {
+          "name": "Refresh Matches",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Token {{school_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"min_score\": 30\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/recommend/refresh/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "recommend", "refresh", ""]
+            },
+            "description": "Re-run the recommendation engine to recompute all matches.\n\nAvailable to any authenticated user (school or teacher).\n\n`min_score` (default 30): pairs scoring below this are skipped."
+          }
+        },
+        {
+          "name": "Get Match Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Token {{school_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/recommend/stats/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "recommend", "stats", ""]
+            },
+            "description": "Return aggregate match statistics for the authenticated user.\n\nReturns different fields depending on whether the caller is a school or teacher:\n- `total_matches`, `mutual_matches`, `avg_score`, `top_match_score`\n- `school_interested`, `teacher_interested` counts\n\nSwap the Authorization header to `Token {{teacher_token}}` to see teacher stats."
+          }
+        },
+        {
+          "name": "Get Match Stats (Teacher)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Token {{teacher_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/recommend/stats/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "recommend", "stats", ""]
+            },
+            "description": "Same stats endpoint called as a teacher – returns teacher-specific aggregate data."
+          }
+        },
+        {
+          "name": "Run Engine (Admin Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Token {{admin_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"min_score\": 30\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/recommend/run/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "recommend", "run", ""]
+            },
+            "description": "Admin-only endpoint that triggers a full recommendation engine run across ALL teachers and unfilled subject needs.\n\nRequires a superuser token in `admin_token`.\n\nReturns counts of created and updated match records."
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔐 Auth – Admin Login",
+      "description": "Helper request to obtain an admin token via DRF's built-in token endpoint (if enabled) or by running `manage.py drf_create_token admin` on the server.",
+      "item": [
+        {
+          "name": "Admin – Get Token via Shell",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/admin/",
+              "host": ["{{base_url}}"],
+              "path": ["admin", ""]
+            },
+            "description": "The admin panel is accessible at `/admin/`.\n\nTo get an admin API token, run this command on the server:\n```\npython manage.py shell -c \"from rest_framework.authtoken.models import Token; from django.contrib.auth.models import User; t, _ = Token.objects.get_or_create(user=User.objects.get(username='admin')); print(t.key)\"\n```\n\nThen paste the printed token into the `admin_token` collection variable."
+          }
+        }
+      ]
+    },
+    {
+      "name": "❌ Error Cases",
+      "description": "Requests that demonstrate validation errors and auth failures.",
+      "item": [
+        {
+          "name": "Register School – Invalid Salary Range",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"bad_school\",\n  \"password\": \"demopass123\",\n  \"name\": \"Bad School\",\n  \"school_type\": \"boys\",\n  \"education_level\": \"high\",\n  \"phone\": \"02100000002\",\n  \"district\": \"District 1\",\n  \"address\": \"1 Test St\",\n  \"subject_needs\": [\n    {\n      \"subject_name\": \"Physics\",\n      \"education_level\": \"high\",\n      \"min_salary_per_hour\": 900000,\n      \"max_salary_per_hour\": 400000\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/schools/register/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "schools", "register", ""]
+            },
+            "description": "Expected response: **400 Bad Request** – min salary exceeds max salary."
+          }
+        },
+        {
+          "name": "Register School – No Subject Needs",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"school_empty\",\n  \"password\": \"demopass123\",\n  \"name\": \"Empty School\",\n  \"school_type\": \"girls\",\n  \"education_level\": \"primary\",\n  \"phone\": \"02100000003\",\n  \"district\": \"District 2\",\n  \"address\": \"2 Test St\",\n  \"subject_needs\": []\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/schools/register/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "schools", "register", ""]
+            },
+            "description": "Expected response: **400 Bad Request** – at least one subject need is required."
+          }
+        },
+        {
+          "name": "Register Teacher – Invalid National ID",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"bad_teacher\",\n  \"password\": \"demopass123\",\n  \"first_name\": \"Bad\",\n  \"last_name\": \"Teacher\",\n  \"national_id\": \"ABCDEFGHIJ\",\n  \"phone\": \"09120000001\",\n  \"education_level\": \"high\",\n  \"district\": \"District 1\",\n  \"experience_years\": 1,\n  \"min_salary_per_hour\": 300000,\n  \"max_salary_per_hour\": 500000,\n  \"subjects\": [\n    {\"subject_name\": \"Math\", \"education_level\": \"high\", \"years_of_experience\": 1}\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/teachers/register/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "teachers", "register", ""]
+            },
+            "description": "Expected response: **400 Bad Request** – national ID must contain digits only."
+          }
+        },
+        {
+          "name": "Login School – Wrong Password",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"school_tehran1\",\n  \"password\": \"wrongpassword\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/schools/login/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "schools", "login", ""]
+            },
+            "description": "Expected response: **401 Unauthorized** – invalid credentials."
+          }
+        },
+        {
+          "name": "Login Teacher with School Account",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"school_tehran1\",\n  \"password\": \"pass1234\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/teachers/login/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "teachers", "login", ""]
+            },
+            "description": "Expected response: **401 Unauthorized** – the teacher login endpoint rejects school credentials."
+          }
+        },
+        {
+          "name": "Access Profile Without Token",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/schools/profile/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "schools", "profile", ""]
+            },
+            "description": "Expected response: **401 Unauthorized** – no auth token provided."
+          }
+        },
+        {
+          "name": "School Match Status – Invalid Status Value",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Token {{school_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"not_a_real_status\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/recommend/school-match/{{match_id}}/status/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "recommend", "school-match", "{{match_id}}", "status", ""]
+            },
+            "description": "Expected response: **400 Bad Request** – invalid status value."
+          }
+        },
+        {
+          "name": "Run Engine Without Admin Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Token {{school_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"min_score\": 30}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/recommend/run/",
+              "host": ["{{base_url}}"],
+              "path": ["api", "recommend", "run", ""]
+            },
+            "description": "Expected response: **403 Forbidden** – only admin users can trigger a full engine run."
+          }
+        }
+      ]
+    }
+  ]
+}

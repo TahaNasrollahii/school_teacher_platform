@@ -1,5 +1,7 @@
 # School-Teacher Matching Platform
 
+👉 [🇮🇷 نسخه فارسی مستندات](#پلتفرم-سینک-معلم-مدرسه-نسخه-فارسی-مستندات)
+
 A Django REST API backend that intelligently connects schools with teachers
 based on district proximity, subject compatibility, and salary range overlap.
 
